@@ -39,7 +39,7 @@ type AllowRelationsToBeIdsOrEntitiesOrPartials<T> = {
 /**
  * A utility function to create-or-update entities coming from a partial-update style API.
  */
-export async function createOrUpdatePartial<T extends Entity, O>(
+export async function createOrUpdatePartial<T extends Entity, O extends DeepPartialOrNull<T>>(
   em: EntityManager,
   constructor: EntityConstructor<T>,
   opts: Exact<DeepPartialOrNull<T>, O>,
@@ -83,7 +83,8 @@ export async function createOrUpdatePartial<T extends Entity, O>(
       return [key, value];
     }
   });
-  const _opts = Object.fromEntries(await Promise.all(p)) as OptsOf<T>;
+
+  const _opts = Object.fromEntries(await Promise.all(p)) as PartialOrNull<OptsOf<T>>;
 
   if (id === null || id === undefined) {
     return em.createPartial(constructor, _opts);

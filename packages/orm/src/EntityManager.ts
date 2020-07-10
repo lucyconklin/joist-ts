@@ -360,7 +360,10 @@ export class EntityManager {
   }
 
   /** Creates a new `type` but with `opts` that are nullable, to accept partial-update-style input. */
-  public createPartial<T extends Entity, O>(type: EntityConstructor<T>, opts: Exact<PartialOrNull<OptsOf<T>>, O>): T {
+  public createPartial<T extends Entity, O extends PartialOrNull<OptsOf<T>>>(
+    type: EntityConstructor<T>,
+    opts: Exact<PartialOrNull<OptsOf<T>>, O>,
+  ): T {
     // We force some manual calls to setOpts to mimic `setUnsafe`'s behavior that `undefined` should
     // mean "ignore" (and we assume validation rules will catch it later) but still set
     // `calledFromConstructor` because this is _basically_ like calling `new`.
@@ -370,7 +373,7 @@ export class EntityManager {
   }
 
   /** Creates a new `type` but with `opts` that are nullable, to accept partial-update-style input. */
-  public createOrUpdatePartial<T extends Entity, O>(
+  public createOrUpdatePartial<T extends Entity, O extends DeepPartialOrNull<T>>(
     type: EntityConstructor<T>,
     opts: Exact<DeepPartialOrNull<T>, O>,
   ): Promise<T> {
@@ -1199,13 +1202,17 @@ async function followReverseHint(entities: Entity[], reverseHint: string[]): Pro
   return current;
 }
 
-type Impossible<K extends keyof any> = {
-  [P in K]: never;
-};
-
-// https://stackoverflow.com/a/57117594/355031 with tweaks
-// T is the exact type, U is the user's passed type.
-// We added `T &` so that U doesn't have to `extend T` to make declarations shorter.
-// We renamed to from `NoExtraProperties` to `Exact` to make TS issue https://github.com/Microsoft/TypeScript/issues/12936
-// We still need `T & U & ...` for some generic use cases.
-export type Exact<T, U> = T & U & Impossible<Exclude<keyof U, keyof T>>;
+export type Exact<T, U> = T &
+  {
+    [K in keyof U]: K extends keyof T
+      ? T[K] extends Array<infer TU> | undefined | null
+        ? U[K] extends Array<infer UU> | undefined | null
+          ? U extends Entity
+            ? Array<U> | undefined | null
+            : T extends Entity
+            ? Array<U> | undefined | null
+            : Array<Exact<TU, UU>> | undefined | null
+          : never
+        : U[K]
+      : never;
+  };

@@ -1,6 +1,3 @@
-import { entityLimit, EntityManager, Loaded, setDefaultEntityLimit, setEntityLimit } from "joist-orm";
-import { Author, Book, Publisher, PublisherSize } from "./entities";
-import { knex, numberOfQueries, queries, resetQueryCount } from "./setupDbTests";
 import {
   insertAuthor,
   insertBook,
@@ -9,6 +6,9 @@ import {
   insertPublisher,
   insertTag,
 } from "@src/entities/inserts";
+import { EntityManager, Loaded, setDefaultEntityLimit, setEntityLimit } from "joist-orm";
+import { Author, Book, Publisher, PublisherSize } from "./entities";
+import { knex, numberOfQueries, queries, resetQueryCount } from "./setupDbTests";
 
 describe("EntityManager", () => {
   it("can load an entity", async () => {
@@ -863,7 +863,7 @@ describe("EntityManager", () => {
   it("doesnt allow unknown fields to create", async () => {
     const em = new EntityManager(knex);
     expect(() => {
-      // @ts-ignore-error
+      // @ts-expect-error
       em.create(Author, { firstName: "a1", invalidKey: 1 });
     }).toThrow("Unknown field invalidKey");
   });

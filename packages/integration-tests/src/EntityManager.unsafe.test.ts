@@ -1,7 +1,7 @@
-import { EntityManager } from "joist-orm";
-import { knex } from "./setupDbTests";
-import { Author, Book } from "./entities";
 import { insertAuthor, insertBook } from "@src/entities/inserts";
+import { EntityManager } from "joist-orm";
+import { Author, Book } from "./entities";
+import { knex } from "./setupDbTests";
 
 describe("EntityManager", () => {
   it("can create new entity with valid data", async () => {
@@ -123,7 +123,7 @@ describe("EntityManager", () => {
     const opts = { firstName: "a2", publisherId: "1" };
     // Then we get a compile error
     await expect(async () => {
-      // @ts-ignore-error
+      // @ts-expect-error
       await em.createOrUpdatePartial(Author, opts);
     }).rejects.toThrow("Unknown field publisherId");
   });
@@ -134,7 +134,7 @@ describe("EntityManager", () => {
     const opts = { firstName: "a2", publisherId: "1" };
     // Then we get a compile error
     await expect(async () => {
-      // @ts-ignore-error
+      // @ts-expect-error
       await em.createPartial(Author, opts);
     }).rejects.toThrow("Unknown field publisherId");
   });

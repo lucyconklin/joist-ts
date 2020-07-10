@@ -175,7 +175,7 @@ export function setField(entity: Entity, fieldName: string, newValue: any): bool
  */
 export function setOpts<T extends Entity>(
   entity: T,
-  values: Partial<OptsOf<T>>,
+  values: PartialOrNull<OptsOf<T>>,
   opts: { calledFromConstructor?: boolean; ignoreUndefined?: boolean },
 ): void {
   // If `values` is undefined, this instance is being hydrated from a database row, so skip all this.
